@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter State Management',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List<Topic> topics = [];
+  List<Topic> savedTopics = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Aquí se inicializa la lista de temas con valores asociados.
+    // En un caso real, esta lista vendría de fuera y no se debe editar.
+    topics = [
+      Topic(name: 'Tema 1', value: 50),
+      Topic(name: 'Tema 2', value: 30),
+      // Agrega más temas según sea necesario.
+    ];
+  }
+
+  void saveCurrentState() {
+    // Hacemos una copia profunda de la lista para guardar el estado.
+    savedTopics = topics.map((topic) => Topic(name: topic.name, value: topic.value)).toList();
+  }
+
+  void restoreSavedState() {
+    setState(() {
+      // Restauramos la lista a partir de la copia guardada.
+      topics = savedTopics.map((topic) => Topic(name: topic.name, value: topic.value)).toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Flutter State Management'),
+      ),
+      body: ListView.builder(
+        itemCount: topics.length,
+        itemBuilder: (context, index) {
+          final topic = topics[index];
+          return ListTile(
+            title: Text(topic.name),
+            trailing: Text(topic.value.toString()),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: saveCurrentState,
+        tooltip: 'Guardar Estado',
+        child: Icon(Icons.save),
+      ),
+    );
+  }
+}
+
+class Topic {
+  String name;
+  int value;
+
+  Topic({required this.name, required this.value});
+}

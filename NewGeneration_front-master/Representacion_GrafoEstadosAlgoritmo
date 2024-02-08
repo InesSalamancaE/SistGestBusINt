@@ -1,0 +1,89 @@
+import 'package:flutter/material.dart';
+import 'package:graphview/GraphView.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Graph Temporal',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: GraphTemporalPage(),
+    );
+  }
+}
+
+class GraphTemporalPage extends StatefulWidget {
+  @override
+  _GraphTemporalPageState createState() => _GraphTemporalPageState();
+}
+
+class _GraphTemporalPageState extends State<GraphTemporalPage> {
+  final Graph graph = Graph()..isTree = true;
+  BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration();
+
+  @override
+  void initState() {
+    super.initState();
+    // Configuración inicial del grafo
+    builder
+      ..siblingSeparation = (100)
+      ..levelSeparation = (150)
+      ..subtreeSeparation = (150)
+      ..orientation = (BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM);
+
+    // Ejemplo de ejecución para un usuario con tres estados
+    var node1 = Node(getNodeWidget(1));
+    var node2 = Node(getNodeWidget(2));
+    var node3 = Node(getNodeWidget(3));
+    var node4 = Node(getNodeWidget(4)); // Estado después de volver al primero
+    var node5 = Node(getNodeWidget(5)); // Segundo estado de la nueva rama
+
+    graph.addEdge(node1, node2);
+    graph.addEdge(node2, node3);
+    graph.addEdge(node1, node4); // Rama nueva
+    graph.addEdge(node4, node5);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Grafo Temporal de Capturas'),
+      ),
+      body: InteractiveViewer(
+        constrained: false,
+        boundaryMargin: EdgeInsets.all(100),
+        minScale: 0.01,
+        maxScale: 5.6,
+        child: GraphView(
+          graph: graph,
+          algorithm: BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
+        ),
+      ),
+    );
+  }
+
+  Widget getNodeWidget(int id) {
+    return InkWell(
+      onTap: () {
+        // Lógica para manejar el salto a un estado anterior y crear una rama nueva
+        print('Nodo $id seleccionado');
+        // Aquí se restauraría el estado y se actualizaría el grafo si es necesario
+      },
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.blue,
+        ),
+        child: Text('Estado $id', style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+}
